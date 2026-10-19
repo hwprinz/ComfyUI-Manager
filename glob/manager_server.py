@@ -27,8 +27,8 @@ import manager_downloader
 import manager_migration
 
 
-logging.info(f"### Loading: ComfyUI-Manager ({core.version_str})")
-logging.info("[ComfyUI-Manager] network_mode: " + core.get_config()['network_mode'])
+logging.info(f"\033[38;5;41m### Loading: ComfyUI-Manager \033[38;2;11;140;233m({core.version_str})\033[0m")
+logging.info("\033[38;5;41m[ComfyUI-Manager]\033[0m network_mode: " + core.get_config()['network_mode'])
 
 comfy_ui_hash = "-"
 comfyui_tag = None
@@ -177,7 +177,7 @@ class ManagerFuncsInComfyUI(core.ManagerFuncs):
 
     def run_script(self, cmd, cwd='.'):
         if len(cmd) > 0 and cmd[0].startswith("#"):
-            logging.error(f"[ComfyUI-Manager] Unexpected behavior: `{cmd}`")
+            logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Unexpected behavior: `{cmd}`")
             return 0
 
         process = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, env=core.get_script_env())
@@ -224,7 +224,7 @@ def set_preview_method(method):
 
 if COMFYUI_HAS_PER_QUEUE_PREVIEW:
     logging.info(
-        "[ComfyUI-Manager] ComfyUI per-queue preview override detected (PR #11261). "
+        "\033[38;5;41m[ComfyUI-Manager]\033[0m ComfyUI per-queue preview override detected (PR #11261). "
         "Manager's preview method feature is disabled. "
         "Use ComfyUI's --preview-method CLI option or 'Settings > Execution > Live preview method'."
     )
@@ -232,7 +232,7 @@ elif args.preview_method == latent_preview.LatentPreviewMethod.NoPreviews:
     set_preview_method(core.get_config()['preview_method'])
 else:
     logging.warning(
-        "[ComfyUI-Manager] Since --preview-method is set, "
+        "\033[38;5;41m[ComfyUI-Manager]\033[0m Since --preview-method is set, "
         "ComfyUI-Manager's preview method feature will be ignored."
     )
 
@@ -283,17 +283,17 @@ def print_comfyui_version():
 
             del cm_global.variables['cm.on_revision_detected_handler']
         else:
-            logging.warning("[ComfyUI-Manager] Some features are restricted due to your ComfyUI being outdated.")
+            logging.warning("\033[38;5;41m[ComfyUI-Manager]\033[0m Some features are restricted due to your ComfyUI being outdated.")
         # <--
 
         if current_branch == "master":
             if comfyui_tag:
-                logging.info(f"### ComfyUI Version: {comfyui_tag} | Released on '{core.comfy_ui_commit_datetime.date()}'")
+                logging.info(f"\033[38;5;41m### ComfyUI Version: \033[38;2;11;140;233m{comfyui_tag}\033[38;5;41m | Released on \033[38;2;11;140;233m'{core.comfy_ui_commit_datetime.date()}'\033[0m")
             else:
                 logging.info(f"### ComfyUI Revision: {core.comfy_ui_revision} [{comfy_ui_hash[:8]}] | Released on '{core.comfy_ui_commit_datetime.date()}'")
         else:
             if comfyui_tag:
-                logging.info(f"### ComfyUI Version: {comfyui_tag} on '{current_branch}' | Released on '{core.comfy_ui_commit_datetime.date()}'")
+                logging.info(f"\033[38;5;41m### ComfyUI Version: \033[38;2;11;140;233m{comfyui_tag}\033[38;5;41m on '\033[38;2;11;140;233m{current_branch}\033[38;5;41m' | Released on \033[38;2;11;140;233m'{core.comfy_ui_commit_datetime.date()}'\033[0m")
             else:
                 logging.info(f"### ComfyUI Revision: {core.comfy_ui_revision} on '{current_branch}' [{comfy_ui_hash[:8]}] | Released on '{core.comfy_ui_commit_datetime.date()}'")
     except:
@@ -427,7 +427,7 @@ def get_model_dir(data, show_log=False):
                 base_model = resolve_custom_node(data['save_path'])
                 if base_model is None:
                     if show_log:
-                        logging.info(f"[ComfyUI-Manager] The target custom node for model download is not installed: {data['save_path']}")
+                        logging.info(f"\033[38;5;41m[ComfyUI-Manager]\033[0m The target custom node for model download is not installed: {data['save_path']}")
                     return None
             else:
                 base_model = os.path.join(models_base, data['save_path'])
@@ -537,11 +537,11 @@ async def task_worker():
             # discard post install if skip_post_install mode
 
             if res.action not in ['skip', 'enable', 'install-git', 'install-cnr', 'switch-cnr']:
-                logging.error(f"[ComfyUI-Manager] Installation failed:\n{res.msg}")
+                logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Installation failed:\n{res.msg}")
                 return res.msg
 
             elif not res.result:
-                logging.error(f"[ComfyUI-Manager] Installation failed:\n{res.msg}")
+                logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Installation failed:\n{res.msg}")
                 return res.msg
 
             return 'success'
@@ -676,10 +676,10 @@ async def task_worker():
 
                 if json_data['filename'] == '<huggingface>':
                     if os.path.exists(os.path.join(model_path, os.path.dirname(json_data['url']))):
-                        logging.error(f"[ComfyUI-Manager] the model path already exists: {model_path}")
+                        logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m the model path already exists: {model_path}")
                         return f"The model path already exists: {model_path}"
 
-                    logging.info(f"[ComfyUI-Manager] Downloading '{model_url}' into '{model_path}'")
+                    logging.info(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Downloading '{model_url}' into '{model_path}'")
                     manager_downloader.download_repo_in_bytes(repo_id=model_url, local_dir=model_path)
 
                     return 'success'
@@ -700,13 +700,13 @@ async def task_worker():
                     if res and model_path.endswith('.zip'):
                         res = core.unzip(model_path)
             else:
-                logging.error(f"[ComfyUI-Manager] Model installation error: invalid model type - {json_data['type']}")
+                logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Model installation error: invalid model type - {json_data['type']}")
 
             if res:
                 return 'success'
 
         except Exception as e:
-            logging.error(f"[ComfyUI-Manager] ERROR: {e}")
+            logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m ERROR: {e}")
 
         return f"Model installation error: {model_url}"
 
@@ -717,7 +717,7 @@ async def task_worker():
         total_count = done_count + task_queue.qsize()
 
         if task_queue.empty():
-            logging.info(f"\n[ComfyUI-Manager] Queued works are completed.\n{stats}")
+            logging.info(f"\n\033[38;5;41m[ComfyUI-Manager]\033[0m Queued works are completed.\n{stats}")
 
             logging.info("\nAfter restarting ComfyUI, please refresh the browser.")
             PromptServer.instance.send_sync("cm-queue-status",
@@ -1208,7 +1208,7 @@ async def remove_snapshot(request):
         path = get_safe_snapshot_path(target)
 
         if path is None:
-            logging.error(f"[ComfyUI-Manager] Invalid snapshot target: {target}")
+            logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Invalid snapshot target: {target}")
             return web.Response(text="Invalid snapshot target", status=400)
 
         if os.path.exists(path):
@@ -1231,7 +1231,7 @@ async def restore_snapshot(request):
         path = get_safe_snapshot_path(target)
 
         if path is None:
-            logging.error(f"[ComfyUI-Manager] Invalid snapshot target: {target}")
+            logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Invalid snapshot target: {target}")
             return web.Response(text="Invalid snapshot target", status=400)
 
         if os.path.exists(path):
@@ -1502,10 +1502,10 @@ async def _queue_node_install(request, operation):
             node_spec_str = f"{cnr_id}@nightly"
             git_url = [json_data.get('repository')]
             if git_url is None:
-                logging.error(f"[ComfyUI-Manager] Following node pack doesn't provide `nightly` version: ${git_url}")
+                logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Following node pack doesn't provide `nightly` version: ${git_url}")
                 return web.Response(status=404, text=f"Following node pack doesn't provide `nightly` version: ${git_url}")
     elif json_data['version'] != 'unknown' and selected_version == 'unknown':
-        logging.error(f"[ComfyUI-Manager] Invalid installation request: {json_data}")
+        logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Invalid installation request: {json_data}")
         return web.Response(status=400, text="Invalid installation request")
     else:
         # unknown
@@ -1758,7 +1758,7 @@ async def install_model(request):
 
     # validate request
     if not await check_whitelist_for_model(json_data):
-        logging.error(f"[ComfyUI-Manager] Invalid model install request is detected: {json_data}")
+        logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Invalid model install request is detected: {json_data}")
         return web.Response(status=400, text="Invalid model install request is detected")
 
     if not json_data['filename'].endswith('.safetensors') and not is_allowed_security_level('high'):
@@ -1934,8 +1934,8 @@ async def get_startup_alerts(request):
         # Convert HTML BR to newlines for customAlert
         text = message.replace('<BR>', '\n').replace('<br>', '\n')
         # Add [ComfyUI-Manager] prefix for customAlert (notice board shows in Manager UI anyway)
-        text = text.replace('[Security Alert]', '[ComfyUI-Manager] Security Alert:')
-        text = text.replace('[MIGRATION]', '[ComfyUI-Manager] Migration:')
+        text = text.replace('[Security Alert]', '\033[38;5;41m[ComfyUI-Manager]\033[0m Security Alert:')
+        text = text.replace('[MIGRATION]', '\033[38;5;41m[ComfyUI-Manager]\033[0m Migration:')
         alerts.append({
             'message': text,
             'level': level
@@ -2029,11 +2029,11 @@ async def load_components(request):
                         # When there is a conflict between the .pack and the .json, the pack takes precedence and overrides.
                         components.update(json.load(file))
                     except json.JSONDecodeError as e:
-                        logging.error(f"[ComfyUI-Manager] Error decoding component file in file {json_file}: {e}")
+                        logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Error decoding component file in file {json_file}: {e}")
 
             return web.json_response(components)
         except Exception as e:
-            logging.error(f"[ComfyUI-Manager] failed to load components\n{e}")
+            logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m failed to load components\n{e}")
             return web.Response(status=400)
     else:
         return web.json_response({})
@@ -2083,9 +2083,10 @@ async def default_cache_update():
             with manager_util.cache_lock:
                 with open(cache_uri, "w", encoding='utf-8') as file:
                     json.dump(json_obj, file, indent=4, sort_keys=True)
-                    logging.info(f"[ComfyUI-Manager] default cache updated: {uri}")
+                    logging.info(f"\033[38;5;41m[ComfyUI-Manager]\033[0m default cache updated.")
+#                    logging.info(f"\033[38;5;41m[ComfyUI-Manager]\033[0m default cache updated: {uri}")
         except Exception as e:
-            logging.error(f"[ComfyUI-Manager] Failed to perform initial fetching '{filename}': {e}")
+            logging.error(f"\033[38;5;41m[ComfyUI-Manager]\033[0m Failed to perform initial fetching '{filename}': {e}")
             traceback.print_exc()
 
     if core.get_config()['network_mode'] != 'offline':
@@ -2098,13 +2099,13 @@ async def default_cache_update():
         await asyncio.gather(a, b, c, d, e)
 
         if core.get_config()['network_mode'] == 'private':
-            logging.info("[ComfyUI-Manager] The private comfyregistry is not yet supported in `network_mode=private`.")
+            logging.info("\033[38;5;41m[ComfyUI-Manager]\033[0m The private comfyregistry is not yet supported in `network_mode=private`.")
         else:
             # load at least once
             await core.unified_manager.reload('remote', dont_wait=False)
             await core.unified_manager.get_custom_nodes(channel_url, 'remote')
 
-    logging.info("[ComfyUI-Manager] All startup tasks have been completed.")
+    logging.info("\033[38;5;41m[ComfyUI-Manager]\033[0m All startup tasks have been completed.")
 
 
 threading.Thread(target=lambda: asyncio.run(default_cache_update())).start()
@@ -2119,5 +2120,4 @@ cm_global.register_extension('ComfyUI-Manager',
                                  'name': 'ComfyUI Manager',
                                  'nodes': {},
                                  'description': 'This extension provides the ability to manage custom nodes in ComfyUI.', })
-
 
